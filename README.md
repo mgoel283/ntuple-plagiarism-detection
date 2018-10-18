@@ -46,7 +46,7 @@ The algorithm was designed as follows:
    with N = 3, it will produce the set:
    ```
    {
-       ("go" ,"for", "a"),
+       ("go", "for", "a"),
        ("for, "a", "run")
    }
    ```
@@ -59,12 +59,9 @@ The algorithm was designed as follows:
     ```
     go for a run
     ```
-    with N = 3, it will produce the set:
+    with N = 3, it will produce the list:
     ```
-    {
-        ("go" ,"for", "a"),
-        ("for, "a", "run")
-    }
+    [("go" ,"for", "a"), ("for, "a", "run")]
     ```
 
 4) Check how many tuples from *file1.txt* occur in *file2.txt* and return the percent value
