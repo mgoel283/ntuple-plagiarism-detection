@@ -20,13 +20,17 @@ class PlagDetect(object):
         :param file_2: File checking for plagiarism
         :param tuple_len: (optional) tuple length
         """
-        if int(tuple_len) <= 0:
-            raise ValueError
+        if tuple_len <= 0:
+            raise ValueError('Invalid tuple size!')
         else:
             self.tuple_len = tuple_len
             self.syn_map = self.syn_hash(syn_file)
-            self.source_dict = self.tuple_list_dict(file_2, 1)
-            self.target_list = self.tuple_list_dict(file_1, 0)
+            self.source_set = self.tuple_list_set(file_2, 1)
+            self.target_list = self.tuple_list_set(file_1, 0)
+
+        # checks that tuple_len isn't larger than file
+        if tuple_len > (self.tuple_len + len(self.source_set) - 1):
+            raise ValueError('Invalid tuple size!')
 
     def syn_hash(self, in_file):
         """
@@ -44,17 +48,17 @@ class PlagDetect(object):
 
         return syn_hashmap
 
-    def tuple_list_dict(self, in_file, want_dict):
+    def tuple_list_set(self, in_file, want_set):
         """
-        Generates a list or dictionary containing tuples from a file
+        Generates a list or set containing tuples from a file
         :param in_file: File to be parsed
-        :param want_dict: Boolean for dictionary (1) or list(0)
-        :return: tuple_struct: Either a list or dictionary of tuples
+        :param want_set: Boolean for set (1) or list(0)
+        :return: tuple_struct: Either a list or set of tuples
         """
         my_tuple = []  # holds a single tuple at a time
 
-        if want_dict:
-            tuple_struct = {}
+        if want_set:
+            tuple_struct = set()
         else:
             tuple_struct = []
 
@@ -70,17 +74,17 @@ class PlagDetect(object):
                         my_tuple.append(word)
 
                         # add tuple to appropriate dict/list
-                        if want_dict:
-                            tuple_struct[tuple(my_tuple)] = True
+                        if want_set:
+                            tuple_struct.add(tuple(my_tuple))
                         else:
                             tuple_struct.append(tuple(my_tuple))
 
                     else:  # fill my_tuple until it reaches length tuple_len
                         my_tuple.append(word)
 
-                        if (len(my_tuple) == self.tuple_len) and want_dict:
-                            tuple_struct[tuple(my_tuple)] = True
-                        elif (len(my_tuple) == self.tuple_len) and not want_dict:
+                        if (len(my_tuple) == self.tuple_len) and want_set:
+                            tuple_struct.add(tuple(my_tuple))
+                        elif (len(my_tuple) == self.tuple_len) and not want_set:
                             tuple_struct.append(tuple(my_tuple))
 
         return tuple_struct
@@ -108,7 +112,7 @@ class PlagDetect(object):
 
         plag_tuples = 0  # count of plagiarized tuples
         for tuple_ind in self.target_list:
-            if tuple_ind in self.source_dict:
+            if tuple_ind in self.source_set:
                 plag_tuples += 1
 
         return (float(plag_tuples) / total_tuples) * 100
